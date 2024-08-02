@@ -13,35 +13,40 @@ class Tile:
         self.x = x
         self.y = y
 
-# game window
-window = tkinter.Tk()
-window.title("Snake")
-window.resizable(False, False) # user cannot change the size of the window
 
-canvas = tkinter.Canvas(window, bg="black", width=WINDOW_WIDTH, height=WINDOW_HEIGHT, borderwidth=0, highlightthickness=0)
-canvas.pack()
-window.update()
+def new_game():
+    global snake, food, snake_body, velocityX, velocityY, game_over, score, highscore
 
-# center the window
-window_width = window.winfo_width()
-window_height = window.winfo_height()
-screen_width = window.winfo_screenwidth()
-screen_height = window.winfo_screenheight() - 75 # the -75 is specific to my screen
+    snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
+    food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
+    snake_body = [] # list of tile objects
+    velocityX = 0
+    velocityY = 0
+    game_over = False
+    if score > highscore:
+        highscore = score
+    score = 0
 
-window_x = int((screen_width/2) - (window_width/2))
-window_y = int((screen_height/2) - (window_height/2))
+    update_games_played()
 
-# format "(w)x(h)+(x)+(y)"
-window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
 
-# initialize game
-snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
-food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
-snake_body = [] # list of tile objects
-velocityX = 0
-velocityY = 0
-game_over = False
-score = 0
+def update_games_played():
+    global num_games
+
+    num_games += 1
+
+    games_played.config(text=f"Game {num_games}")
+
+
+def update_high_score():
+    global score, highscore
+
+    if score > highscore:
+        high_score.config(text=f"Highscore\n{score}")
+        return 1
+    elif score == highscore:
+        return 0
+
 
 def change_direction(keystroke):
     global velocityX, velocityY, game_over
@@ -117,9 +122,71 @@ def draw():
     window.after(100, draw) # after 100ms we call draw again which is 10 frames/sec
 
     if (game_over):
-        canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font="Arial 20", text=f"Game Over: {score}", fill="red")
+        highscore_outcome = update_high_score()
+        if highscore_outcome == 1:
+            canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font="Arial 20",
+                           text=f"Game Over: {score}\nNew Highscore Achieved!\nYou beat your previous\nhighscore by {score - highscore}",
+                           fill="red")
+        elif highscore_outcome == 0:
+            canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font="Arial 20",
+                           text=f"Game Over: {score}\nYou Matched Your Previous Highscore!", fill="red")
+        else:
+            canvas.create_text(WINDOW_WIDTH/2, WINDOW_HEIGHT/2, font="Arial 20",
+                           text=f"Game Over: {score}", fill="red")
     else:
         canvas.create_text(30, 20, font="Arial 10", text=f"Score: {score}", fill="white")
+
+
+# initialize game
+snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
+food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
+snake_body = [] # list of tile objects
+velocityX = 0
+velocityY = 0
+game_over = False
+score = 0
+num_games = 1
+highscore = 0
+
+# game window
+window = tkinter.Tk()
+window.title("Snake")
+window.resizable(False, False) # user cannot change the size of the window
+
+frame = tkinter.Frame(window)
+frame.pack()
+
+canvas = tkinter.Canvas(frame, bg="black", width=WINDOW_WIDTH, height=WINDOW_HEIGHT, borderwidth=0, highlightthickness=0)
+canvas.pack(side=tkinter.LEFT)
+
+# creating a tracker for the number of games played
+games_played = tkinter.Label(frame, text=f"Game {num_games}", font=("Consolas", 20),
+                      background="black", foreground="white")
+games_played.pack(fill = "x")
+
+# creating a high score tracker of all the games played
+high_score = tkinter.Label(frame, text=f"Highscore\n{highscore}", font=("Consolas", 20),
+                      background="black", foreground="white")
+high_score.pack(fill = "x")
+
+# creating a restart button
+restart_button = tkinter.Button(frame, text="Restart", font=("Consolas", 16), background="red",
+                        foreground="white", command=new_game)
+restart_button.pack(fill = "x")
+
+window.update()
+
+# center the window
+window_width = window.winfo_width()
+window_height = window.winfo_height()
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight() - 75 # the -75 is specific to my screen
+
+window_x = int((screen_width/2) - (window_width/2))
+window_y = int((screen_height/2) - (window_height/2))
+
+# format "(w)x(h)+(x)+(y)"
+window.geometry(f"{window_width}x{window_height}+{window_x}+{window_y}")
 
 draw()
 
