@@ -102,7 +102,7 @@ def move():
 
         food.x = random.randint(0,COLS-1) * TILE_SIZE # change the food's location
         food.y = random.randint(0, ROWS-1) * TILE_SIZE
-        while (food.x == poison.x and food.y == poison.y): # make sure the food is not in the same place as the poison
+        while (food.x == poison1.x and food.y == poison1.y): # make sure the food is not in the same place as the poison
             food.x = random.randint(0,COLS-1) * TILE_SIZE
             food.y = random.randint(0, ROWS-1) * TILE_SIZE
 
@@ -110,20 +110,52 @@ def move():
 
     # check poison collision
     if gamemode == 1:
-        if (snake.x == poison.x and snake.y == poison.y):
+        if (snake.x == poison1.x and snake.y == poison1.y):
             if len(snake_body) + 1 - 3 > 0: # snake can survive the poison
                 snake_body = snake_body[:len(snake_body) - 3] # loses 3 cubes
 
-                poison.x = random.randint(0,COLS-1) * TILE_SIZE # change the poison's location
-                poison.y = random.randint(0, ROWS-1) * TILE_SIZE
-                while (food.x == poison.x and food.y == poison.y): # make sure the poison is not in the same place as the food
-                    poison.x = random.randint(0,COLS-1) * TILE_SIZE
-                    poison.y = random.randint(0, ROWS-1) * TILE_SIZE
+                poison1.x = random.randint(0,COLS-1) * TILE_SIZE # change the poison's location
+                poison1.y = random.randint(0, ROWS-1) * TILE_SIZE
+                while (food.x == poison1.x and food.y == poison1.y): # make sure the poison is not in the same place as the food
+                    poison1.x = random.randint(0,COLS-1) * TILE_SIZE
+                    poison1.y = random.randint(0, ROWS-1) * TILE_SIZE
 
                 score -= 3
             else:
                 game_over = True
                 return
+            
+        elif score >= 15:
+            if (snake.x == poison2.x and snake.y == poison2.y):
+                if len(snake_body) + 1 - 3 > 0: # snake can survive the poison
+                    snake_body = snake_body[:len(snake_body) - 3] # loses 3 cubes
+
+                    poison2.x = random.randint(0,COLS-1) * TILE_SIZE # change the poison's location
+                    poison2.y = random.randint(0, ROWS-1) * TILE_SIZE
+                    while ((food.x == poison2.x and food.y == poison2.y) or (poison2.x == poison1.x and poison2.y == poison1.y)): # make sure the poison is not in the same place as the food
+                        poison2.x = random.randint(0,COLS-1) * TILE_SIZE
+                        poison2.y = random.randint(0, ROWS-1) * TILE_SIZE
+
+                    score -= 3
+                else:
+                    game_over = True
+                    return
+                
+            elif score >= 35:
+                if (snake.x == poison3.x and snake.y == poison3.y):
+                    if len(snake_body) + 1 - 3 > 0: # snake can survive the poison
+                        snake_body = snake_body[:len(snake_body) - 3] # loses 3 cubes
+
+                        poison2.x = random.randint(0,COLS-1) * TILE_SIZE # change the poison's location
+                        poison2.y = random.randint(0, ROWS-1) * TILE_SIZE
+                        while ((food.x == poison3.x and food.y == poison3.y) or (poison3.x == poison1.x and poison3.y == poison1.y) or (poison3.x == poison2.x and poison3.y == poison2.y)): # make sure the poison is not in the same place as the food
+                            poison2.x = random.randint(0,COLS-1) * TILE_SIZE
+                            poison2.y = random.randint(0, ROWS-1) * TILE_SIZE
+
+                        score -= 3
+                    else:
+                        game_over = True
+                        return
 
 
     # update snake body
@@ -142,7 +174,7 @@ def move():
 
 
 def draw():
-    global snake, food, snake_body, game_over, score, gamemode, poison
+    global snake, food, snake_body, game_over, score, gamemode, poison1
     move()
 
     canvas.delete("all")
@@ -151,8 +183,14 @@ def draw():
     canvas.create_rectangle(food.x, food.y, food.x + TILE_SIZE, food.y + TILE_SIZE, fill=COLOR_LIST_FOOD[color_index_food])
 
     # draw poison
-    if gamemode == 1 and score <= 100:
-        canvas.create_rectangle(poison.x, poison.y, poison.x + TILE_SIZE, poison.y + TILE_SIZE, fill="yellow")
+    if gamemode == 1 and score < 100:
+        canvas.create_rectangle(poison1.x, poison1.y, poison1.x + TILE_SIZE, poison1.y + TILE_SIZE, fill="yellow")
+
+        if score >= 15:
+            canvas.create_rectangle(poison2.x, poison2.y, poison2.x + TILE_SIZE, poison2.y + TILE_SIZE, fill="yellow")
+
+            if score >= 35:
+                canvas.create_rectangle(poison3.x, poison3.y, poison3.x + TILE_SIZE, poison3.y + TILE_SIZE, fill="yellow")
 
     # draw snake
     canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill=COLOR_LIST_SNAKE[color_index_snake])
@@ -181,7 +219,9 @@ def draw():
 # initialize game
 snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
 food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
-poison = Tile(15*TILE_SIZE,15*TILE_SIZE)
+poison1 = Tile(15*TILE_SIZE,15*TILE_SIZE)
+poison2 = Tile(3*TILE_SIZE,16*TILE_SIZE)
+poison3 = Tile(8*TILE_SIZE,13*TILE_SIZE)
 snake_body = [] # list of tile objects
 velocityX = 0
 velocityY = 0
