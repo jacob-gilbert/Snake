@@ -1,16 +1,16 @@
-## Snake
+# Snake
 
-# Directions
+### Directions
 - Download and run snake.py
 
-# Features
+### Features
 - Game played counter
 - Highscore tracker
 
-# Known Bugs
+### Known Bugs
 - Pressing two keys too closely together causes gameover
 - Food can spawn within the snake
 
-# Upcoming additions/changes
+### Upcoming additions/changes
 - Color selection
 - Different game modes
