@@ -8,6 +8,7 @@
 - Highscore tracker
 - Change the color of the snake
 - Change the color of the food
+- Second gamemode that adds a poison block that takes away 3 points and 3 units of length
 
 ### Known Bugs
 - Pressing two keys too closely together causes gameover
