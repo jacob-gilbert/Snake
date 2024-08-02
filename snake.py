@@ -15,7 +15,7 @@ class Tile:
 
 
 def new_game():
-    global snake, food, snake_body, velocityX, velocityY, game_over, score, highscore
+    global snake, food, snake_body, velocityX, velocityY, game_over, score, highscore, num_games
 
     snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
     food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
@@ -26,15 +26,7 @@ def new_game():
     if score > highscore:
         highscore = score
     score = 0
-
-    update_games_played()
-
-
-def update_games_played():
-    global num_games
-
     num_games += 1
-
     games_played.config(text=f"Game {num_games}")
 
 
