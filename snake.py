@@ -8,7 +8,9 @@ TILE_SIZE = 25
 WINDOW_WIDTH = TILE_SIZE * COLS
 WINDOW_HEIGHT = TILE_SIZE * ROWS
 
-COLOR_LIST = ["lime green", "blue", "yellow", "orange", "white", "purple"]
+COLOR_LIST_SNAKE = ["lime green", "blue", "yellow", "orange", "white", "purple"]
+COLOR_LIST_FOOD = ["red", "light salmon", "coral", "light coral", "tomato", "hot pink",
+                   "light pink", "pale violet red", "violet red", "dark orchid", "blue violet", "teal"]
 
 class Tile:
     def __init__(self, x, y):
@@ -42,10 +44,16 @@ def update_high_score():
         return 0
     
 
-def change_color():
-    global color_index
+def change_color_snake():
+    global color_index_snake
 
-    color_index = (color_index + 1) % len(COLOR_LIST)
+    color_index_snake = (color_index_snake + 1) % len(COLOR_LIST_SNAKE)
+
+
+def change_color_food():
+    global color_index_food
+
+    color_index_food = (color_index_food + 1) % len(COLOR_LIST_FOOD)
 
 
 def change_direction(keystroke):
@@ -111,13 +119,13 @@ def draw():
     canvas.delete("all")
 
     # draw tile
-    canvas.create_rectangle(food.x, food.y, food.x + TILE_SIZE, food.y + TILE_SIZE, fill="red")
+    canvas.create_rectangle(food.x, food.y, food.x + TILE_SIZE, food.y + TILE_SIZE, fill=COLOR_LIST_FOOD[color_index_food])
 
     # draw snake
-    canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill=COLOR_LIST[color_index])
+    canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill=COLOR_LIST_SNAKE[color_index_snake])
 
     for tile in snake_body:
-        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill=COLOR_LIST[color_index])
+        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill=COLOR_LIST_SNAKE[color_index_snake])
 
     window.after(100, draw) # after 100ms we call draw again which is 10 frames/sec
 
@@ -147,7 +155,8 @@ game_over = False
 score = 0
 num_games = 1
 highscore = 0
-color_index = 0 # the index number relates to the color of the snake
+color_index_snake = 0 # the index number relates to the color of the snake
+color_index_food = 0
 
 # game window
 window = tkinter.Tk()
@@ -162,12 +171,12 @@ canvas.pack(side=tkinter.LEFT)
 
 # creating a tracker for the number of games played
 games_played = tkinter.Label(frame, text=f"Game {num_games}", font=("Consolas", 20),
-                      background="black", foreground="white")
+                      background="gold", foreground="white")
 games_played.pack(fill = "x")
 
 # creating a high score tracker of all the games played
 high_score = tkinter.Label(frame, text=f"Highscore\n{highscore}", font=("Consolas", 20),
-                      background="black", foreground="white")
+                      background="silver", foreground="white")
 high_score.pack(fill = "x")
 
 # creating a restart button
@@ -175,10 +184,15 @@ restart_button = tkinter.Button(frame, text="Restart", font=("Consolas", 16), ba
                         foreground="white", command=new_game)
 restart_button.pack(fill = "x")
 
-# creating a color change button
-color_change = tkinter.Button(frame, text="Change\nColor", font=("Consolas", 16), background="lime green",
-                        foreground="white", command=change_color)
-color_change.pack(fill = "x")
+# creating a color change button for the snake
+color_change_s = tkinter.Button(frame, text="Change\nSnake", font=("Consolas", 16), background="lime green",
+                        foreground="white", command=change_color_snake)
+color_change_s.pack(fill = "x")
+
+# creating a color change button for the food
+color_change_b = tkinter.Button(frame, text="Change\nFood", font=("Consolas", 16), background="blue violet",
+                        foreground="white", command=change_color_food)
+color_change_b.pack(fill = "x")
 
 window.update()
 
