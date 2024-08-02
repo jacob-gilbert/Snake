@@ -8,7 +8,7 @@ TILE_SIZE = 25
 WINDOW_WIDTH = TILE_SIZE * COLS
 WINDOW_HEIGHT = TILE_SIZE * ROWS
 
-COLOR_LIST_SNAKE = ["lime green", "blue", "yellow", "orange", "white", "purple"]
+COLOR_LIST_SNAKE = ["lime green", "blue", "maroon", "orange", "white", "purple"]
 COLOR_LIST_FOOD = ["red", "light salmon", "coral", "light coral", "tomato", "hot pink",
                    "light pink", "pale violet red", "violet red", "dark orchid", "blue violet", "teal"]
 
@@ -56,6 +56,12 @@ def change_color_food():
     color_index_food = (color_index_food + 1) % len(COLOR_LIST_FOOD)
 
 
+def gamemode_change():
+    global gamemode
+
+    gamemode = (gamemode + 1) % 2
+
+
 def change_direction(keystroke):
     global velocityX, velocityY, game_over
 
@@ -93,9 +99,32 @@ def move():
     # check food collision
     if (snake.x == food.x and snake.y == food.y):
         snake_body.append(Tile(food.x, food.y))
-        food.x = random.randint(0,COLS-1) * TILE_SIZE
+
+        food.x = random.randint(0,COLS-1) * TILE_SIZE # change the food's location
         food.y = random.randint(0, ROWS-1) * TILE_SIZE
+        while (food.x == poison.x and food.y == poison.y): # make sure the food is not in the same place as the poison
+            food.x = random.randint(0,COLS-1) * TILE_SIZE
+            food.y = random.randint(0, ROWS-1) * TILE_SIZE
+
         score += 1
+
+    # check poison collision
+    if gamemode == 1:
+        if (snake.x == poison.x and snake.y == poison.y):
+            if len(snake_body) + 1 - 3 > 0: # snake can survive the poison
+                snake_body = snake_body[:len(snake_body) - 3] # loses 3 cubes
+
+                poison.x = random.randint(0,COLS-1) * TILE_SIZE # change the poison's location
+                poison.y = random.randint(0, ROWS-1) * TILE_SIZE
+                while (food.x == poison.x and food.y == poison.y): # make sure the poison is not in the same place as the food
+                    poison.x = random.randint(0,COLS-1) * TILE_SIZE
+                    poison.y = random.randint(0, ROWS-1) * TILE_SIZE
+
+                score -= 3
+            else:
+                game_over = True
+                return
+
 
     # update snake body
     for i in range(len(snake_body)-1, -1, -1):
@@ -113,13 +142,17 @@ def move():
 
 
 def draw():
-    global snake, food, snake_body, game_over, score
+    global snake, food, snake_body, game_over, score, gamemode, poison
     move()
 
     canvas.delete("all")
 
     # draw tile
     canvas.create_rectangle(food.x, food.y, food.x + TILE_SIZE, food.y + TILE_SIZE, fill=COLOR_LIST_FOOD[color_index_food])
+
+    # draw poison
+    if gamemode == 1 and score <= 100:
+        canvas.create_rectangle(poison.x, poison.y, poison.x + TILE_SIZE, poison.y + TILE_SIZE, fill="yellow")
 
     # draw snake
     canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill=COLOR_LIST_SNAKE[color_index_snake])
@@ -148,6 +181,7 @@ def draw():
 # initialize game
 snake = Tile(5*TILE_SIZE, 5*TILE_SIZE) # single tile for snake's head
 food = Tile(10*TILE_SIZE, 10*TILE_SIZE)
+poison = Tile(15*TILE_SIZE,15*TILE_SIZE)
 snake_body = [] # list of tile objects
 velocityX = 0
 velocityY = 0
@@ -157,6 +191,7 @@ num_games = 1
 highscore = 0
 color_index_snake = 0 # the index number relates to the color of the snake
 color_index_food = 0
+gamemode = 0
 
 # game window
 window = tkinter.Tk()
@@ -193,6 +228,11 @@ color_change_s.pack(fill = "x")
 color_change_b = tkinter.Button(frame, text="Change\nFood", font=("Consolas", 16), background="blue violet",
                         foreground="white", command=change_color_food)
 color_change_b.pack(fill = "x")
+
+# creating a button to activate the second gamemode
+change_gamemode = tkinter.Button(frame, text="Change\nMode", font=("Consolas", 16), background="navy",
+                        foreground="white", command=gamemode_change)
+change_gamemode.pack(fill = "x")
 
 window.update()
 
