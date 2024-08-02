@@ -8,6 +8,8 @@ TILE_SIZE = 25
 WINDOW_WIDTH = TILE_SIZE * COLS
 WINDOW_HEIGHT = TILE_SIZE * ROWS
 
+COLOR_LIST = ["lime green", "blue", "yellow", "orange", "white", "purple"]
+
 class Tile:
     def __init__(self, x, y):
         self.x = x
@@ -38,6 +40,12 @@ def update_high_score():
         return 1
     elif score == highscore:
         return 0
+    
+
+def change_color():
+    global color_index
+
+    color_index = (color_index + 1) % len(COLOR_LIST)
 
 
 def change_direction(keystroke):
@@ -106,10 +114,10 @@ def draw():
     canvas.create_rectangle(food.x, food.y, food.x + TILE_SIZE, food.y + TILE_SIZE, fill="red")
 
     # draw snake
-    canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill="lime green")
+    canvas.create_rectangle(snake.x, snake.y, snake.x + TILE_SIZE, snake.y + TILE_SIZE, fill=COLOR_LIST[color_index])
 
     for tile in snake_body:
-        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill="lime green")
+        canvas.create_rectangle(tile.x, tile.y, tile.x + TILE_SIZE, tile.y + TILE_SIZE, fill=COLOR_LIST[color_index])
 
     window.after(100, draw) # after 100ms we call draw again which is 10 frames/sec
 
@@ -139,6 +147,7 @@ game_over = False
 score = 0
 num_games = 1
 highscore = 0
+color_index = 0 # the index number relates to the color of the snake
 
 # game window
 window = tkinter.Tk()
@@ -165,6 +174,11 @@ high_score.pack(fill = "x")
 restart_button = tkinter.Button(frame, text="Restart", font=("Consolas", 16), background="red",
                         foreground="white", command=new_game)
 restart_button.pack(fill = "x")
+
+# creating a color change button
+color_change = tkinter.Button(frame, text="Change\nColor", font=("Consolas", 16), background="lime green",
+                        foreground="white", command=change_color)
+color_change.pack(fill = "x")
 
 window.update()
 
